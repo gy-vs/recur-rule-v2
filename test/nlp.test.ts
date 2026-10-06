@@ -121,6 +121,33 @@ describe('NLP', () => {
     expect(rrule.toText()).toBe('every week until November 10, 2012')
   })
 
+  it('marks rules with byeaster as not fully convertible to text', () => {
+    const rrule = RRule.fromString(
+      'DTSTART:20240101T090000Z\nRRULE:FREQ=YEARLY;BYEASTER=0;COUNT=2'
+    )
+
+    expect(rrule.isFullyConvertibleToText()).toBe(false)
+    expect(rrule.toText()).toBe('every year for 2 times (~ approximate)')
+  })
+
+  it('marks rules with byeaster and byhour as not fully convertible to text', () => {
+    const rrule = RRule.fromString(
+      'DTSTART:20240101T090000Z\nRRULE:FREQ=YEARLY;BYEASTER=-2;BYHOUR=10;COUNT=2'
+    )
+
+    expect(rrule.isFullyConvertibleToText()).toBe(false)
+    expect(rrule.toText()).toBe('every year for 2 times (~ approximate)')
+  })
+
+  it('marks sub-daily rules with byeaster as not fully convertible to text', () => {
+    const rrule = RRule.fromString(
+      'DTSTART:20240101T090000Z\nRRULE:FREQ=HOURLY;BYEASTER=0;COUNT=3'
+    )
+
+    expect(rrule.isFullyConvertibleToText()).toBe(false)
+    expect(rrule.toText()).toBe('every hour for 3 times (~ approximate)')
+  })
+
   it("formats 'until' as desired if asked", () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,

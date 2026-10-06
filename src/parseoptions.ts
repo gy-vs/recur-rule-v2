@@ -34,8 +34,6 @@ export function initializeOptions(options: Partial<Options>) {
 export function parseOptions(options: Partial<Options>) {
   const opts = { ...DEFAULT_OPTIONS, ...initializeOptions(options) }
 
-  if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
-
   if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
     throw new Error(`Invalid frequency: ${opts.freq} ${options.freq}`)
   }

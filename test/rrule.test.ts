@@ -2786,6 +2786,51 @@ describe('RRule', function () {
   )
 
   testRecurring(
+    'testHourlyByEaster',
+    new RRule({
+      freq: RRule.HOURLY,
+      count: 3,
+      byeaster: 0,
+      dtstart: parse('20240101T090000'),
+    }),
+    [
+      datetime(2024, 3, 31, 0, 0),
+      datetime(2024, 3, 31, 1, 0),
+      datetime(2024, 3, 31, 2, 0),
+    ]
+  )
+
+  testRecurring(
+    'testHourlyByEasterPos',
+    new RRule({
+      freq: RRule.HOURLY,
+      count: 3,
+      byeaster: 1,
+      dtstart: parse('20240101T090000'),
+    }),
+    [
+      datetime(2024, 4, 1, 0, 0),
+      datetime(2024, 4, 1, 1, 0),
+      datetime(2024, 4, 1, 2, 0),
+    ]
+  )
+
+  testRecurring(
+    'testHourlyByEasterNeg',
+    new RRule({
+      freq: RRule.HOURLY,
+      count: 3,
+      byeaster: -1,
+      dtstart: parse('20240101T090000'),
+    }),
+    [
+      datetime(2024, 3, 30, 0, 0),
+      datetime(2024, 3, 30, 1, 0),
+      datetime(2024, 3, 30, 2, 0),
+    ]
+  )
+
+  testRecurring(
     'testMinutely',
     new RRule({
       freq: RRule.MINUTELY,
@@ -3242,6 +3287,22 @@ describe('RRule', function () {
   )
 
   testRecurring(
+    'testMinutelyByEaster',
+    new RRule({
+      freq: RRule.MINUTELY,
+      count: 3,
+      interval: 30,
+      byeaster: 1,
+      dtstart: parse('20240101T090000'),
+    }),
+    [
+      datetime(2024, 4, 1, 0, 0),
+      datetime(2024, 4, 1, 0, 30),
+      datetime(2024, 4, 1, 1, 0),
+    ]
+  )
+
+  testRecurring(
     'testSecondly',
     new RRule({
       freq: RRule.SECONDLY,
@@ -3682,6 +3743,21 @@ describe('RRule', function () {
   )
 
   testRecurring(
+    'testSecondlyByEaster',
+    new RRule({
+      freq: RRule.SECONDLY,
+      count: 3,
+      byeaster: 0,
+      dtstart: parse('20240101T090000'),
+    }),
+    [
+      datetime(2024, 3, 31, 0, 0, 0),
+      datetime(2024, 3, 31, 0, 0, 1),
+      datetime(2024, 3, 31, 0, 0, 2),
+    ]
+  )
+
+  testRecurring(
     'testUntilNotMatching',
     new RRule({
       freq: RRule.DAILY,
@@ -3905,6 +3981,27 @@ describe('RRule', function () {
       const rr = RRule.fromString(rule)
       expect(rr.toText()).toBeTruthy()
       // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
+    })
+  })
+
+  it('keeps the requested frequency in options.freq when byeaster is set', function () {
+    ;[
+      RRule.YEARLY,
+      RRule.MONTHLY,
+      RRule.WEEKLY,
+      RRule.DAILY,
+      RRule.HOURLY,
+      RRule.MINUTELY,
+      RRule.SECONDLY,
+    ].forEach(function (freq) {
+      const rule = new RRule({
+        freq: freq,
+        count: 3,
+        byeaster: 0,
+        dtstart: parse('20240101T090000'),
+      })
+      expect(rule.options.freq).toBe(freq)
+      expect(rule.toString()).toContain(`FREQ=${RRule.FREQUENCIES[freq]}`)
     })
   })
 
