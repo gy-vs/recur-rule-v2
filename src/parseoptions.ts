@@ -34,7 +34,13 @@ export function initializeOptions(options: Partial<Options>) {
 export function parseOptions(options: Partial<Options>) {
   const opts = { ...DEFAULT_OPTIONS, ...initializeOptions(options) }
 
-  if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
+  // BYEASTER is a day-level filter (as in python-dateutil). For daily and
+  // lower frequencies, iterating yearly yields the same occurrences, so we
+  // keep the historical coercion. Sub-daily frequencies must keep their
+  // freq so that hours/minutes/seconds are generated within the Easter day.
+  if (isPresent(opts.byeaster) && freqIsDailyOrGreater(opts.freq)) {
+    opts.freq = RRule.YEARLY
+  }
 
   if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
     throw new Error(`Invalid frequency: ${opts.freq} ${options.freq}`)

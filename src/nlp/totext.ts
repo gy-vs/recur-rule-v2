@@ -137,6 +137,9 @@ export default class ToText {
 
     if (!(rrule.options.freq in ToText.IMPLEMENTED)) return false
     if (rrule.origOptions.until && rrule.origOptions.count) return false
+    // BYEASTER has no text representation; a rule using it can only be
+    // described approximately.
+    if (isPresent(rrule.origOptions.byeaster)) return false
 
     for (const key in rrule.origOptions) {
       if (contains(['dtstart', 'tzid', 'wkst', 'freq'], key)) return true
